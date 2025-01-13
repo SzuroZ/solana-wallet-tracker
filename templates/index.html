@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet"> <!-- Clean Font Link -->
+    <style>
+        body {
+           background: rgba(0, 0, 0, 0); /* Fully transparent background */
+        }
+
+        #balance-container {
+            position: relative;
+            width: 600px;
+            height: 200px; /* Adjust height */
+            background: url('static/1340411.jpeg') no-repeat center;
+            background-size: cover;
+            background-position: top center; /* Adjust background position */
+            display: flex;
+            flex-direction: row; /* Horizontal layout */
+            justify-content: space-between; /* Space between balance and PNL */
+            align-items: center;
+            padding: 0 20px; /* Add padding for content spacing */
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #balance-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* 60% transparency overlay */
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-family: 'Roboto', sans-serif; /* Apply Clean Font */
+        }
+
+        .balance {
+            font-size: 1em; /* Increased font size for clarity */
+            margin: 0;
+            text-align: left;
+        }
+
+        .pnl {
+            font-size: 1em; /* Increased font size for clarity */
+            margin: 0;
+            text-align: right;
+            color: green;
+        }
+
+        .pnl.negative {
+            color: red;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 5px;
+            left: 25px; /* Align to the bottom left corner */
+            font-size: 0.8em;
+            color: #bbb;
+            z-index: 1;
+            opacity: 0.4;
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="balance-container">
+        <div class="content">
+            <p class="balance" id="balance">BALANCE: 0 SOL</p>
+            <p class="pnl" id="pnl">PNL TODAY: 0 SOL</p>
+        </div>
+        <p class="footer">made by @Szuro</p>
+    </div>
+
+    <script>
+        async function fetchBalance() {
+            try {
+                const response = await fetch("/balance");
+                const data = await response.json();
+
+                document.getElementById("balance").innerText = `BALANCE: ${data.balance.toFixed(3)} SOL`;
+                const pnlElement = document.getElementById("pnl");
+
+                pnlElement.innerText = `PNL TODAY: ${data.pnl.toFixed(3)} SOL`;
+                pnlElement.classList.toggle("negative", data.pnl < 0);
+            } catch (error) {
+                console.error("Error fetching balance:", error);
+                document.getElementById("balance").innerText = "Error fetching balance";
+                document.getElementById("pnl").innerText = "Error fetching PNL";
+            }
+        }
+
+        fetchBalance();
+        setInterval(fetchBalance, 3000); // Update every 3 seconds
+    </script>
+</body>
+</html>
