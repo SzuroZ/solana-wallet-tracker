@@ -3,151 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallet Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <title>Balance Widget</title>
     <style>
         body {
-            background: rgba(0, 0, 0, 0); /* Fully transparent background */
+            margin: 10;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: transparent; /* Transparent background for Twitch overlays */
+            font-family: Arial, sans-serif;
+            color: #fff;
+            background-color: black;
         }
 
-        @keyframes pulseBackground {
-            0% {
-                box-shadow: 0 0 20px 4px rgba(138, 43, 226, 0.5); /* Halvány lila */
-            }
-            50% {
-                box-shadow: 0 0 40px 10px rgba(138, 43, 226, 0.8); /* Intenzív lila */
-            }
-            100% {
-                box-shadow: 0 0 20px 4px rgba(138, 43, 226, 0.5); /* Halvány lila */
-            }
-        }
-        #balance-container {
-            position: relative;
-            width: 600px;
-            height: 200px;
-            background: url('static/1340411.jpeg') no-repeat center;
-            background-size: cover;
-            background-position: top center;
+        .container {
+            background: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+            border-radius: 25px;
+            padding: 20px 30px;
             display: flex;
-            flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            animation: pulseBackground 5s infinite; /* Animáció hozzáadása */
+            width: 300px;
+            height: 150px;
+            position: relative;
+            overflow: hidden; /* Ensure child elements don't overflow the container */
+            animation: glow 4s infinite ease-in-out; /* Smoother and smaller glowing animation */
         }
+        
+        /* Animation for the smaller glowing effect */
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.4); /* Smaller, more subtle glow */
+            }
+            25% {
+                box-shadow: 3px 3px 15px 4px rgba(255, 255, 255, 0.6); /* Slightly stronger, but still small */
+            }
+            50% {
+                box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.8); /* Medium glow size */
+            }
+            75% {
+                box-shadow: -3px -3px 15px 4px rgba(255, 255, 255, 0.6); /* Return to a small glow */
+            }
+            100% {
+                box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.4); /* Smallest glow at the end */
+            }
+        }
+        
 
-        #balance-container::before {
-            content: '';
+
+        .container::before {
+            content: "";
             position: absolute;
-            top: 0;
+            top: -60px; /* Move the background image up */
             left: 0;
             width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4); /* 60% transparency overlay */
+            height: 130%; /* Extend height for better positioning */
+            background: url('/static/killua-pfp-4201.png') no-repeat center top;
+            background-size: cover;
+            opacity: 0.3; /* Adjust the opacity for better readability */
+            z-index: 0; /* Place it behind content */
         }
 
-        .content {
-            position: relative;
-            z-index: 1;
-            color: white;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            font-family: 'Roboto', sans-serif; /* Apply Clean Font */
-        }
-
-        .balance, .pnl {
-            font-size: 1em;
-            margin: 0;
-            display: flex;
-            align-items: center; /* Center align text and logo */
+        .balance-row, .pnl-row {
+            display: flex; /* Aligns text and logo horizontally */
+            align-items: center; /* Vertically centers text and logo */
         }
 
         .sol-logo {
             width: 15px;
             height: auto;
-            margin-left: 5px; /* Add spacing between text and logo */
+            margin-left: 5px; /* Spacing between text and logo */
             vertical-align: middle;
             transition: filter 0.3s ease; /* Smooth transition for color change */
             filter: grayscale(100%);
         }
 
-        .pnl {
-            color: rgb(9, 175, 9); /* Default color for positive PNL */
-        }
-
-        .pnl.negative {
-            color: red; /* Change to red when PNL is negative */
-        }
-
-        /* Zöld (szöveg színével azonos) */
+        /* Green for positive PNL */
         .pnl:not(.negative) .sol-logo {
             filter: invert(47%) sepia(95%) saturate(321%) hue-rotate(86deg) brightness(0.95) contrast(1);
         }
 
-        /* Piros (szöveg színével azonos) */
+        /* Red for negative PNL */
         .pnl.negative .sol-logo {
             filter: invert(31%) sepia(98%) saturate(7496%) hue-rotate(1deg) brightness(1.1) contrast(1.2);
         }
 
+        .section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            z-index: 1; /* Ensure content is above the background */
+        }
+
+        .section:nth-child(2) {
+            align-items: flex-end;
+        }
+
+        .label {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .balance, .pnl {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .balance {
+            color: #ffffff;
+        }
+
+        .pnl {
+            color: #c6fcc6; /* Default green for positive */
+        }
+
         .footer {
-            position: absolute;
-            bottom: 5px;
-            left: 25px;
-            font-size: 0.8em;
-            color: #bbb;
+            font-size: 0.9rem;
+            color: #ffffff; /* Light pink color */
+            text-align: center;
+            margin-top: 10px;
             z-index: 1;
-            opacity: 0.7;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0.6;
         }
     </style>
-</head>
-<body>
-    <div id="balance-container">
-        <div class="content">
-            <p class="balance" id="balance">
-                BALANCE:&nbsp;
-                <span id="balance-value">0</span>
-                <img src="static/solana_logo.png" alt="Solana Logo" class="sol-logo">
-            </p>
-            <p class="pnl" id="pnl">
-                PNL TODAY:&nbsp; 
-                <span id="pnl-value">0</span>
-                <img src="static/solana_logo.png" alt="Solana Logo" class="sol-logo">
-            </p>
-        </div>
-        <p class="footer">made by @SzuroZ</p>
-    </div>
-
     <script>
-        async function fetchBalance() {
+        async function fetchData() {
             try {
-                const response = await fetch("/balance");
+                const response = await fetch('/balance');
                 const data = await response.json();
 
-                // Update the balance
-                document.getElementById("balance-value").innerText = `${data.balance.toFixed(2)}`;
+                document.querySelector('.balance-value').textContent = `${data.balance.toFixed(2)}`;
 
-                // Update the PNL
-                const pnlElement = document.getElementById("pnl-value");
-                pnlElement.innerText = ` ${data.pnl.toFixed(2)}`;
-
-                // Toggle PNL color and logo based on positive/negative value
-                const pnlContainer = document.getElementById("pnl");
-                pnlContainer.classList.toggle("negative", data.pnl < 0);
+                const pnlElement = document.querySelector('.pnl-value');
+                pnlElement.textContent = `${data.pnl >= 0 ? '+' : ''}${data.pnl.toFixed(2)}`;
+                pnlElement.style.color = data.pnl >= 0 ? '#c6fcc6' : '#fcd0d0'; // Green for positive, red for negative
+                pnlElement.classList.toggle('negative', data.pnl < 0); // Add 'negative' class if PNL is negative
             } catch (error) {
-                console.error("Error fetching balance:", error);
-                document.getElementById("balance").innerText = "Error fetching balance";
-                document.getElementById("pnl").innerText = "Error fetching PNL";
+                console.error('Error fetching data:', error);
             }
         }
 
-        // Initial fetch and periodic updates
-        fetchBalance();
-        setInterval(fetchBalance, 10000); // Update every 10 seconds
+        // Refresh data every 3 seconds
+        setInterval(fetchData, 3000);
+        window.onload = fetchData;
     </script>
+</head>
+<body>
+    <div class="container">
+        <div class="section">
+            <div class="label">BALANCE:</div>
+            <div class="balance-row">
+                <div class="balance balance-value">0.00</div>
+                <img src="static/solana_logo.png" alt="Solana Logo" class="sol-logo">
+            </div>
+        </div>
+        <div class="section">
+            <div class="label">PNL TODAY:</div>
+            <div class="pnl-row">
+                <div class="pnl pnl-value">0.00</div>
+            </div>
+        </div>
+        <div class="footer">made by @SzuroZ</div>
+    </div>
 </body>
 </html>

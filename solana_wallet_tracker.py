@@ -10,7 +10,7 @@ import pytz  # For time zone handling
 app = Flask(__name__)
 
 # Wallet address||
-WALLET_ADDRESS = "6RoLbZJWJHpTk4sdPsWzocEHiRtzPS36WcBjnMXuQrfU"
+WALLET_ADDRESS = "3RmzSs3B1Qd6Kf3LTN6r3W5TQhh7M6hBnntpEExMr17m"
 
 # Tároló az aktuális egyenleghez és PNL-hez
 wallet_data = {"balance": 0, "pnl": 0}
