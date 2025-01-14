@@ -4,27 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wallet Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet"> <!-- Clean Font Link -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         body {
-           background: rgba(0, 0, 0, 0); /* Fully transparent background */
+            background: rgba(0, 0, 0, 0); /* Fully transparent background */
         }
 
+        @keyframes pulseBackground {
+            0% {
+                box-shadow: 0 0 20px 4px rgba(138, 43, 226, 0.5); /* Halvány lila */
+            }
+            50% {
+                box-shadow: 0 0 40px 10px rgba(138, 43, 226, 0.8); /* Intenzív lila */
+            }
+            100% {
+                box-shadow: 0 0 20px 4px rgba(138, 43, 226, 0.5); /* Halvány lila */
+            }
+        }
         #balance-container {
             position: relative;
             width: 600px;
-            height: 200px; /* Adjust height */
+            height: 200px;
             background: url('static/1340411.jpeg') no-repeat center;
             background-size: cover;
-            background-position: top center; /* Adjust background position */
+            background-position: top center;
             display: flex;
-            flex-direction: row; /* Horizontal layout */
-            justify-content: space-between; /* Space between balance and PNL */
+            flex-direction: row;
+            justify-content: space-between;
             align-items: center;
-            padding: 0 20px; /* Add padding for content spacing */
+            padding: 0 20px;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            animation: pulseBackground 5s infinite; /* Animáció hozzáadása */
         }
 
         #balance-container::before {
@@ -48,42 +60,66 @@
             font-family: 'Roboto', sans-serif; /* Apply Clean Font */
         }
 
-        .balance {
-            font-size: 1em; /* Increased font size for clarity */
+        .balance, .pnl {
+            font-size: 1em;
             margin: 0;
-            text-align: left;
+            display: flex;
+            align-items: center; /* Center align text and logo */
+        }
+
+        .sol-logo {
+            width: 15px;
+            height: auto;
+            margin-left: 5px; /* Add spacing between text and logo */
+            vertical-align: middle;
+            transition: filter 0.3s ease; /* Smooth transition for color change */
+            filter: grayscale(100%);
         }
 
         .pnl {
-            font-size: 1em; /* Increased font size for clarity */
-            margin: 0;
-            text-align: right;
-            color: green;
+            color: rgb(9, 175, 9); /* Default color for positive PNL */
         }
 
         .pnl.negative {
-            color: red;
+            color: red; /* Change to red when PNL is negative */
+        }
+
+        /* Zöld (szöveg színével azonos) */
+        .pnl:not(.negative) .sol-logo {
+            filter: invert(47%) sepia(95%) saturate(321%) hue-rotate(86deg) brightness(0.95) contrast(1);
+        }
+
+        /* Piros (szöveg színével azonos) */
+        .pnl.negative .sol-logo {
+            filter: invert(31%) sepia(98%) saturate(7496%) hue-rotate(1deg) brightness(1.1) contrast(1.2);
         }
 
         .footer {
             position: absolute;
             bottom: 5px;
-            left: 25px; /* Align to the bottom left corner */
+            left: 25px;
             font-size: 0.8em;
             color: #bbb;
             z-index: 1;
-            opacity: 0.4;
+            opacity: 0.7;
         }
-        
     </style>
 </head>
 <body>
     <div id="balance-container">
         <div class="content">
-            <p class="balance" id="balance">BALANCE: 0 SOL</p>
-            <p class="pnl" id="pnl">PNL TODAY: 0 SOL</p>
+            <p class="balance" id="balance">
+                BALANCE:&nbsp;
+                <span id="balance-value">0</span>
+                <img src="static/solana_logo.png" alt="Solana Logo" class="sol-logo">
+            </p>
+            <p class="pnl" id="pnl">
+                PNL TODAY:&nbsp; 
+                <span id="pnl-value">0</span>
+                <img src="static/solana_logo.png" alt="Solana Logo" class="sol-logo">
+            </p>
         </div>
-        <p class="footer">made by @Szuro</p>
+        <p class="footer">made by @SzuroZ</p>
     </div>
 
     <script>
@@ -92,11 +128,16 @@
                 const response = await fetch("/balance");
                 const data = await response.json();
 
-                document.getElementById("balance").innerText = `BALANCE: ${data.balance.toFixed(3)} SOL`;
-                const pnlElement = document.getElementById("pnl");
+                // Update the balance
+                document.getElementById("balance-value").innerText = `${data.balance.toFixed(2)}`;
 
-                pnlElement.innerText = `PNL TODAY: ${data.pnl.toFixed(3)} SOL`;
-                pnlElement.classList.toggle("negative", data.pnl < 0);
+                // Update the PNL
+                const pnlElement = document.getElementById("pnl-value");
+                pnlElement.innerText = ` ${data.pnl.toFixed(2)}`;
+
+                // Toggle PNL color and logo based on positive/negative value
+                const pnlContainer = document.getElementById("pnl");
+                pnlContainer.classList.toggle("negative", data.pnl < 0);
             } catch (error) {
                 console.error("Error fetching balance:", error);
                 document.getElementById("balance").innerText = "Error fetching balance";
@@ -104,8 +145,9 @@
             }
         }
 
+        // Initial fetch and periodic updates
         fetchBalance();
-        setInterval(fetchBalance, 3000); // Update every 3 seconds
+        setInterval(fetchBalance, 10000); // Update every 10 seconds
     </script>
 </body>
 </html>
